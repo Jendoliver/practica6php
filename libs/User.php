@@ -68,11 +68,12 @@ class User
         $_SESSION["surname"] = self::$surname;
         $_SESSION["type"] = self::$type;
     }
-    public function closeSession() { $_SESSION = array(); }
+    public function closeSession() { session_start(); $_SESSION = array(); }
     
     public function submitEvent($eventType) // Creates a new event of eventType associated with the user
     {
         $event = new Event(self::$username, $eventType);
         $event->submit();
+        return;
     }
 }

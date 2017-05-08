@@ -12,5 +12,5 @@ abstract class UserEvents extends BasicEnum
     // Tracking events
     const LOGIN = 'I';
     const MSG_CHECK = 'C';
-    const MSG_VIEW = 'R';
+    const MSG_WRITE = 'R';
 }
