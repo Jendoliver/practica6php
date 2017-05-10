@@ -6,4 +6,7 @@ abstract class Constants
     const dburl = "localhost";
     const dbuser = "jandol";
     const dbpass = "";
+    
+    // Routes
+    const index = "/index.php";
 }

@@ -8,6 +8,7 @@ abstract class UserEvents extends BasicEnum
     const USER_ALREADY_EXISTS = 2;
     const USER_DOESNT_EXIST = 3;
     const WRONG_PASSWORD = 4;
+    const PASSWORDS_DONT_MATCH = 5;
     
     // Tracking events
     const LOGIN = 'I';

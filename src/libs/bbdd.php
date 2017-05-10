@@ -10,7 +10,7 @@ function connect($database)
 {
     $connection = new mysqli(Constants::dburl, Constants::dbuser, Constants::dbpass, $database);
     if ($mysqli->connect_errno) 
-        echo "Fallo al conectar a MySQL: " . $mysqli->connect_error;
+        echo "Error connecting to MySQL: " . $mysqli->connect_error;
     return $connection;
 }
 
