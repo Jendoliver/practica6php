@@ -17,7 +17,7 @@
         if(isset($_POST["login"])) // Login case
         {
             // Creation of the user
-            $user = User::create()->setUsername($_POST["username"])->setPassword($_POST["password"]);
+            $user = User::create()->setUsername($_POST["username"])->setPasswordLogin($_POST["password"]);
             // We try to log the user in and get a response
             $response = $user->login();
             if($response == UserEvents::OK) // If the response is OK...

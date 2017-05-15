@@ -36,13 +36,13 @@ class Event
     public static function fetchLastEvent($username, $type) // This returns the date of the last event of type $type from the user of username $username registered on the db
     {
         $con = connect(Constants::db);
-        $query = "SELECT date FROM event WHERE user = '$username' AND type = '$type';";
+        $query = "SELECT date FROM event WHERE user = '$username' AND type = '$type' ORDER BY date DESC;";
         $res = $con->query($query);
         disconnect($con);
-        if($res)
+        if($res->num_rows > 0)
         {
             $row = $res->fetch_row();
-            return $row[0];
+            return strval($row[0]);
         }
         return "undefined"; // TODO: potential refactor here,
     }

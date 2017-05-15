@@ -9,40 +9,89 @@
     <title>STUCOM MAIL</title>
 </head>
 <body>
-    <?php session_start(); require_once "libs/errors.php";
+    <?php session_start(); require_once "libs/errors.php"; require_once "libs/success.php"; require_once "libs/Utils.php";
     if(empty($_SESSION["username"])) 
     { // Are you logged in
         permisionDenied();
     } 
     else 
-    { require_once "libs/User.php"; $user = create()->setUsername($_SESSION["username"])->fetchInfo();
-    if(isset($_POST["changepass"])) // Password change maybe
+    { require_once "libs/User.php"; require_once "libs/Admin.php";
+    $user = ($_SESSION["type"] == 1) ? Admin::create() : User::create(); // Proper instantiation
+    $user->setUsername($_SESSION["username"])->fetchInfo();
+    
+    /******** PASSWORD CHANGE ***********/
+    if(isset($_POST["changepass"]))
     {
-        if(password_verify($_POST["password-act"], $user->getPassword()))
+        if(password_verify($_POST["password-act"], $user->getPassword())) // If actual password is correct
         {
-            if($_POST["password"] == $_POST["password-confirm"] && $_POST["password"] != $_POST["password-act"]) // If password equals confirmation but is different from the previous one
+            if($_POST["password"] == $_POST["password-confirm"]) // If password equals confirmation
             {
-                $user->setPassword($_POST["password"]);
-                $user->updateInfo();
+                if($_POST["password"] != $_POST["password-act"]) //  If password is different from the previous one
+                {
+                    $user->setPassword($_POST["password"]);
+                    $user->updateInfo();
+                    successUser(SuccMsgs::PASSWORD_CHANGED);
+                }
+                else
+                    errorUser(UserEvents::SAME_PASSWORD);
             }
             else
-                errorChangePassword();
+                errorUser(UserEvents::PASSWORDS_DONT_MATCH);
         }
         else
-            errorBadLogin();
+            errorUser(UserEvents::WRONG_PASSWORD);
     }
-    else if(isset($_POST["deluser"])) // Dewa
+    
+    /******* SEND NEW MESSAGE *********/
+    else if(isset($_POST["sendmsg"]))
     {
-        extract($_POST);
-        if(deleteUser($user)) // TODO
-            userDeleted();
+        $user->sendMail($_POST["to"], $_POST["subj"], $_POST["body"]);
+        $user->submitEvent(UserEvents::MSG_WRITE);
+        successUser(SuccMsgs::MSG_SENT);
     }
+    
+    /******* REGISTER AN USER (admin only) ********/
+    else if(isset($_POST["newuser"]))
+    {
+        if($_POST["newuser-password"] == $_POST["newuser-password-confirm"])
+        {
+            $newuser = User::create()->
+                        setUsername($_POST["newuser-username"])->
+                        setPassword($_POST["newuser-password"])->
+                        setName($_POST["newuser-name"])->
+                        setSurname($_POST["newuser-surname"])->
+                        setType($_POST["newuser-type"]);
+            $response = $newuser->register();
+            if($response == UserEvents::OK)
+                successUser(SuccMsgs::USER_REGISTERED);
+            else
+                errorUser($response);
+        }
+        else
+            errorUser(UserEvents::PASSWORDS_DONT_MATCH);
+    }
+    
+    /****** DELETE AN USER (admin only) ********/
+    else if(isset($_POST["deluser"]))
+    {
+        if($user->deleteUser($_POST["deluser-username"]))
+            successUser(SuccMsgs::USER_DELETED);
+        else
+            echo "PODRIT";
+    }
+    
+    /***** FETCH LAST LOGIN FROM AN USER (admin only) ******/
+    else if(isset($_POST["lastlogin"]))
+    {
+        lastLogin($user->fetchLastLoginFrom($_POST["lastlogin-username"]));
+    }
+    
     else
     {
     include "header.php"; ?>
     <div class="row">
         <div class="col-md-4"></div>
-        <div class="col-md-4"><h1 style="text-align: center;">¡Bienvenido, <?php echo $_SESSION["username"]; ?>!</h1></div>
+        <div class="col-md-4"><h1 style="text-align: center;">¡Bienvenido, <?php echo $user->getName(); ?>!</h1></div>
         <div class="col-md-4">
             <div class="col-md-6"></div>
             <div class="col-md-3"><a href="logout.php" class="btn btn-block btn-danger">Cerrar sesión</a></div>
@@ -55,9 +104,8 @@
             <!-- PERSONAL INFO -->
             <article id="info" class="well">
                 <h2>Información personal</h2>
-                <?php session_start(); extract($_SESSION); ?>
-                <h3><span class="glyphicon glyphicon-envelope"></span> Correo electrónico: <?php echo $username."@stukolm.com"; ?></h3>
-                <h3><span class="glyphicon glyphicon-user"></span> Nombre y apellido: <?php echo $name." ".$surname; ?></h3>
+                <h3><span class="glyphicon glyphicon-envelope"></span> Correo electrónico: <?php echo $user->getUsername()."@stukolm.com"; ?></h3>
+                <h3><span class="glyphicon glyphicon-user"></span> Nombre y apellido: <?php echo $user->getName()." ".$user->getSurname(); ?></h3>
             </article>
             <!-- CHANGE PASSWORD -->
             <article id="changepass" class="well">
@@ -79,95 +127,119 @@
                 </form>
             </article>
             <!-- end CHANGE PASSWORD -->
+            
+            <!-- NEW MESSAGE -->
+            <article id="newmsg" class="well">
+                <!-- TODO -->
+            </article>
+            <!-- end NEW MESSAGE -->
+            
+            <!-- INBOX -->
+            <article id="inbox" class="well">
+                <h2>Mensajes recibidos</h2>
+            </article>
+            <!-- end INBOX -->
+            
             <!-- SENT MESSAGES -->
             <article id="sent" class="well">
-                <!-- TODO -->
+                <h2>Mensajes enviados</h2>
             </article>
             <!-- end SENT MESSAGES -->
-            <!-- RECEIVED MESSAGES -->
-            <article id="received" class="well">
-                <!-- TODO -->
+    
+    <!-- ///////////////////// ADMIN SECTION //////////////////// -->      
+    <?php } if($user->getType() == 1) { ?>
+            <!-- USERS LIST -->
+            <article id="user-list" class="well">
+                <h2>Listado de usuarios del sistema</h2>
+                <div class="container-fluid">
+                    <?php $user->checkUsers(); ?>
+                </div>
             </article>
-            <!-- end RECEIVED MESSAGES -->
+            <!-- end USERS LIST -->
             
-    <?php } if($_SESSION["type"] == 1) { ?> <!-- ADMIN SECTION -->
-            <!-- CARD ADDITION -->
-            <article id="newcard" class="well">
-                <h2>Crear nuevas cartas</h2>
+            <!-- REGISTER USER -->
+            <article id="newuser" class="well">
+                <h2>Registrar un nuevo usuario</h2>
                 <form action="" method="POST">
                     <div class="form-group">
-                        <label for="name"><span class="glyphicon glyphicon-chevron-right"></span> Nombre de la carta:</label>
-                        <input type="text" class="form-control" name="name" maxlength="30" required>
+                        <label for="username">Nombre de usuario:</label>
+                        <input type="text" class="form-control" name="newuser-username" placeholder="pop3lover" maxlength="10" required>
                     </div>
                     <div class="form-group">
-                        <label for="type"><span class="glyphicon glyphicon-chevron-right"></span> Tipo de carta:</label>
-                        <select class="form-control" name="type" required>
-                            <option value="Tropa">Tropa</option>
-                            <option value="Estructura">Estructura</option>
-                            <option value="Hechizo">Hechizo</option>
-                        </select>
+                        <label for="password">Contraseña:</label>
+                        <input type="password" class="form-control" name="newuser-password" placeholder="007" maxlength="20" required>
                     </div>
                     <div class="form-group">
-                        <label for="rarity"><span class="glyphicon glyphicon-chevron-right"></span> Calidad de la carta:</label>
-                        <select class="form-control" name="rarity" required>
-                            <option value="Común">Común</option>
-                            <option value="Especial">Especial</option>
-                            <option value="Épica">Épica</option>
-                            <option value="Legendaria">Legendaria</option>
-                        </select>
+                        <label for="password-confirm">Confirmar contraseña:</label>
+                        <input type="password" class="form-control" name="newuser-password-confirm" placeholder="007" maxlength="20" required>
                     </div>
                     <div class="form-group">
-                        <label for="hp"><span class="glyphicon glyphicon-chevron-right"></span> Vida de la carta:</label>
-                        <input type="number" class="form-control" name="hp" min="1" max="20" required>
+                        <label for="realname">Nombre:</label>
+                        <input type="text" class="form-control" name="newuser-name" placeholder="Pepito" maxlength="20" required>
                     </div>
                     <div class="form-group">
-                        <label for="dmg"><span class="glyphicon glyphicon-chevron-right"></span> Daño de la carta:</label>
-                        <input type="number" class="form-control" name="dmg" min="1" max="20" required>
+                        <label for="surname">Apellido:</label>
+                        <input type="text" class="form-control" name="newuser-surname" placeholder="Grillo" maxlength="50" required>
                     </div>
                     <div class="form-group">
-                        <label for="cost"><span class="glyphicon glyphicon-chevron-right"></span> Coste de la carta:</label>
-                        <input type="number" class="form-control" name="cost" min="1" max="10" required>
+                        <label for="type">Tipo de usuario:</label>
+                        <label class="radio-inline">
+                            <input type="radio" name="newuser-type" value="0" selected>Usuario corriente
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="newuser-type" value="1">Administrador
+                        </label>
                     </div>
-                    <input id="submit-type" type="submit" class="btn btn-primary btn-block" name="newcard" value="¡Crear carta!">
+                    <input id="submit-type" type="submit" class="btn btn-success btn-block" name="newuser" value="Registrar">
                 </form>
             </article>
-            <!-- BEST PLAYERS -->
-            <article id="bestplayers" class="well">
-                <h2>Los mejores jugadores</h2>
-                <?php tableBestPlayers(); ?>
-            </article>
+            <!-- end REGISTER USER -->
+            
             <!-- DELETE USER -->
             <article id="deleteuser" class="well">
                 <h2>Eliminar a un usuario</h2>
                 <form action="" method="POST">
                     <div class="form-group">
                         <label for="name"><span class="glyphicon glyphicon-chevron-right"></span> Nombre del usuario:</label>
-                        <select class="form-control" name="user">
-                            <?php selectAllUsers(); ?>
+                        <select class="form-control" name="deluser-username">
+                            <?php Utils::fetchUsersOption(); ?>
                         </select>
                     </div>
                     <input id="submit-type" type="submit" class="btn btn-danger btn-block" name="deluser" value="ELIMINAR USUARIO">
                 </form>
             </article>
-            <!-- GIVE CARD -->
-            <article id="givecard" class="well">
-                <h2>Dar carta a un jugador</h2>
+            <!-- end DELETE USER -->
+            
+            <!-- FETCH ALL MESSAGES -->
+            <article id="all-messages" class="well">
+                <h2>Todos los mensajes</h2>
+                <div class="container-fluid">
+                    
+                </div>
+            </article>
+            <!-- end FETCH ALL MESSAGES -->
+            
+            <!-- LAST LOGIN -->
+            <article id="last-login" class="well">
+                <h2>Obtener última conexión</h2>
                 <form action="" method="POST">
                     <div class="form-group">
                         <label for="name"><span class="glyphicon glyphicon-chevron-right"></span> Nombre del usuario:</label>
-                        <select class="form-control" name="user">
-                            <?php selectAllUsers(); ?>
+                        <select class="form-control" name="lastlogin-username">
+                            <?php Utils::fetchUsersOption(); ?>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="name"><span class="glyphicon glyphicon-chevron-right"></span> Nombre de la carta:</label>
-                        <select class="form-control" name="card">
-                            <?php selectAllCards(); ?>
-                        </select>
-                    </div>
-                    <input id="submit-type" type="submit" class="btn btn-success btn-block" name="givecard" value="¡Regalar carta!">
+                    <input id="submit-type" type="submit" class="btn btn-info btn-block" name="lastlogin" value="Obtener última conexión">
                 </form>
             </article>
+            <!-- end LAST LOGIN -->
+            
+            <!-- TOP MSGS RANKING -->
+            <article id="ranking-msgs" class="well">
+                <h2>Ranking mensajes enviados</h2>
+            </article>
+            <!-- end TOP MSGS RANKING -->
+            
     <?php } ?> </div><div class="col-md-1"></div></div> <?php }  ?>
 </body>
 </html>

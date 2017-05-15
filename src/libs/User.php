@@ -30,6 +30,7 @@ class User
     // Setters (ninja constructor overload)
     public function setUsername($newUsername)   { $this->username = $newUsername; return $this; }
     public function setPassword($newPassword)   { $this->password = password_hash($newPassword, PASSWORD_DEFAULT); return $this; }
+    public function setPasswordLogin($newPassword)   { $this->password = $newPassword; return $this; } // Patch
     public function setName($newName)           { $this->name = $newName; return $this; }
     public function setSurname($newSurname)     { $this->surname = $newSurname; return $this; }
     public function setType($newType)           { $this->type = $newType; return $this; }
@@ -89,9 +90,6 @@ class User
     {
         session_start();
         $_SESSION["username"] = $this->username;
-        $_SESSION["password"] = $this->password;
-        $_SESSION["name"] = $this->name;
-        $_SESSION["surname"] = $this->surname;
         $_SESSION["type"] = $this->type;
     }
     
