@@ -15,26 +15,9 @@ class Admin extends User
     public function checkUsers()    // - check list of all users
     {
         $con = connect(Constants::db);
-        $query = "SELECT * FROM user;";
-        if($con->query($query))
-        {
-            disconnect($con);
-            // TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        }
+        $res = $con->query("SELECT name, surname, username FROM user;");
+        Utils::createTable($res);
     }
-    /* MIGHT BE UNNECESARY
-    public function registerUser($User, $type=0) // Registers an User with type 0 (Basic) or 1 (Admin) -- DEFAULT 0
-    {
-        $con = connect(Constants::db);
-        $query = "INSERT INTO user VALUES ('".$User->getUsername()."', '".$User->getPassword()."', '".$User->getName()."', '".$User->getSurname()."', ".$type.");";
-        if($con->query($query))
-        {
-            disconnect($con);
-            return UserEvents::OK;
-        }
-        disconnect($con);
-        return UserEvents::USER_ALREADY_EXISTS;
-    }*/
     
     public function deleteUser($username) // Function called to delete an user. Returns true if correctly deleted, false if error
     {
@@ -64,14 +47,14 @@ class Admin extends User
     public function fetchMsgRanking() // - get ranking of users, sorted by sent message quantity
     {
         $con = connect(Constants::db);
-        $query = "SELECT username, COUNT(sender) AS msgs
-                    FROM user INNER JOIN message
+        $query = "SELECT name, surname, username, COUNT(*) AS msgs
+                    FROM user INNER JOIN message ON user.username = message.sender
                     GROUP BY sender
                     ORDER BY msgs DESC;";
         if($res = $con->query($query))
         {
             disconnect($con);
-            createTable($res);
+            Utils::createTable($res);
         }
     }
 }

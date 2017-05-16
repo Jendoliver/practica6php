@@ -18,22 +18,22 @@ class User
     }
     
     // Ninja constructor
-    public static function create()             { $instance = new self(); return $instance; }
+    public static function create()                 { $instance = new self(); return $instance; }
     
     // Getters
-    public function getUsername()               { return $this->username; }
-    public function getPassword()               { return $this->password; }
-    public function getName()                   { return $this->name; }
-    public function getSurname()                { return $this->surname; }
-    public function getType()                   { return $this->type; }
+    public function getUsername()                   { return $this->username; }
+    public function getPassword()                   { return $this->password; }
+    public function getName()                       { return $this->name; }
+    public function getSurname()                    { return $this->surname; }
+    public function getType()                       { return $this->type; }
     
     // Setters (ninja constructor overload)
-    public function setUsername($newUsername)   { $this->username = $newUsername; return $this; }
-    public function setPassword($newPassword)   { $this->password = password_hash($newPassword, PASSWORD_DEFAULT); return $this; }
-    public function setPasswordLogin($newPassword)   { $this->password = $newPassword; return $this; } // Patch
-    public function setName($newName)           { $this->name = $newName; return $this; }
-    public function setSurname($newSurname)     { $this->surname = $newSurname; return $this; }
-    public function setType($newType)           { $this->type = $newType; return $this; }
+    public function setUsername($newUsername)       { $this->username = $newUsername; return $this; }
+    public function setPassword($newPassword)       { $this->password = password_hash($newPassword, PASSWORD_DEFAULT); return $this; }
+    public function setPasswordLogin($newPassword)  { $this->password = $newPassword; return $this; } // Patch
+    public function setName($newName)               { $this->name = $newName; return $this; }
+    public function setSurname($newSurname)         { $this->surname = $newSurname; return $this; }
+    public function setType($newType)               { $this->type = $newType; return $this; }
     
     // Methods
     public function login() // Function called when an user tries to login, returns enum with event

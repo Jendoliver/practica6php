@@ -9,15 +9,42 @@
     <title>STUCOM MAIL</title>
 </head>
 <body>
-    <?php session_start(); require_once "libs/errors.php"; require_once "libs/success.php"; require_once "libs/Utils.php";
+    <?php session_start(); require_once "libs/errors.php"; require_once "libs/success.php";
+    
+    // ARE YOU LOGGED IN¿¿¿
     if(empty($_SESSION["username"])) 
-    { // Are you logged in
+    {
         permisionDenied();
     } 
-    else 
-    { require_once "libs/User.php"; require_once "libs/Admin.php";
+    else { 
+      
+    /***** INITIALIZATION ******/  
+    require_once "libs/User.php"; require_once "libs/Admin.php"; require_once "libs/MailServer.php"; require_once "libs/Utils.php";
     $user = ($_SESSION["type"] == 1) ? Admin::create() : User::create(); // Proper instantiation
     $user->setUsername($_SESSION["username"])->fetchInfo();
+    $MailServer = new MailServer();
+    $MailServer->refresh($user->getUsername());
+    
+    
+    /***** MAILSERVER COUNTERS *****/
+    if (isset($_GET["incount"]))
+        $incount = $_GET["incount"];
+    else
+        $incount = 0;
+    if (isset($_GET["outcount"]))
+        $outcount = $_GET["outcount"];
+    else
+        $outcount = 0;
+    if (isset($_GET["totalcount"]))
+        $totalcount = $_GET["totalcount"];
+    else
+        $totalcount = 0;
+    
+    /******************************
+     *                            *
+     *          POST ZONE         *
+     *                            *
+     ******************************/
     
     /******** PASSWORD CHANGE ***********/
     if(isset($_POST["changepass"]))
@@ -86,6 +113,11 @@
         lastLogin($user->fetchLastLoginFrom($_POST["lastlogin-username"]));
     }
     
+    /******************************
+     *                            *
+     *          MAIN VIEW         *
+     *                            *
+     ******************************/
     else
     {
     include "header.php"; ?>
@@ -107,6 +139,8 @@
                 <h3><span class="glyphicon glyphicon-envelope"></span> Correo electrónico: <?php echo $user->getUsername()."@stukolm.com"; ?></h3>
                 <h3><span class="glyphicon glyphicon-user"></span> Nombre y apellido: <?php echo $user->getName()." ".$user->getSurname(); ?></h3>
             </article>
+            <!-- end PERSONAL INFO -->
+            
             <!-- CHANGE PASSWORD -->
             <article id="changepass" class="well">
                 <h2>Modificar contraseña</h2>
@@ -123,36 +157,58 @@
                         <label for="password-confirm"><span class="glyphicon glyphicon-chevron-right"></span> Confirmar nueva contraseña:</label>
                         <input type="password" class="form-control" name="password-confirm" placeholder="007" maxlength="10">
                     </div>
-                    <input id="submit-type" type="submit" class="btn btn-primary btn-block" name="changepass" value="Cambiar contraseña">
+                    <input type="submit" class="btn btn-primary btn-block" name="changepass" value="Cambiar contraseña">
                 </form>
             </article>
             <!-- end CHANGE PASSWORD -->
             
             <!-- NEW MESSAGE -->
+            <?php require_once "modal-newmsg.php"; ?>
             <article id="newmsg" class="well">
-                <!-- TODO -->
+                <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#newMsg"><span class="glyphicon glyphicon-pencil"/> Redactar mensaje</button>
             </article>
             <!-- end NEW MESSAGE -->
             
             <!-- INBOX -->
             <article id="inbox" class="well">
                 <h2>Mensajes recibidos</h2>
+                <div class="container-fluid">
+                    <table class="table table-hover">
+                        <thead><th>Emisor</th><th>Asunto</th><th>Fecha / Hora</th></thead>
+                        <tbody>
+                            <?php $MailServer->getInbox()->showMsgsTo($user->getUsername(), $incount); ?>
+                        </tbody>
+                    </table>
+                </div>
             </article>
             <!-- end INBOX -->
             
             <!-- SENT MESSAGES -->
             <article id="sent" class="well">
                 <h2>Mensajes enviados</h2>
+                <div class="container-fluid">
+                    <table class="table table-hover">
+                        <thead><th>Receptor</th><th>Asunto</th><th>Fecha / Hora</th></thead>
+                        <tbody>
+                            <?php $MailServer->getSent()->showMsgsFrom($user->getUsername(), $outcount); ?>
+                        </tbody>
+                    </table>
+                </div>
             </article>
             <!-- end SENT MESSAGES -->
     
-    <!-- ///////////////////// ADMIN SECTION //////////////////// -->      
+    <!-- \\\\\\\\\\\\\\\\\\\\ ADMIN SECTION //////////////////// -->      
     <?php } if($user->getType() == 1) { ?>
             <!-- USERS LIST -->
             <article id="user-list" class="well">
                 <h2>Listado de usuarios del sistema</h2>
                 <div class="container-fluid">
-                    <?php $user->checkUsers(); ?>
+                    <table class="table table-hover">
+                        <thead><th>Nombre</th><th>Apellido</th><th>Nombre de usuario</th></thead>
+                        <tbody>
+                            <?php $user->checkUsers(); ?>
+                        </tbody>
+                    </table>
                 </div>
             </article>
             <!-- end USERS LIST -->
@@ -184,10 +240,10 @@
                     <div class="form-group">
                         <label for="type">Tipo de usuario:</label>
                         <label class="radio-inline">
-                            <input type="radio" name="newuser-type" value="0" selected>Usuario corriente
+                            <input type="radio" name="newuser-type" value="0" checked> Usuario corriente
                         </label>
                         <label class="radio-inline">
-                            <input type="radio" name="newuser-type" value="1">Administrador
+                            <input type="radio" name="newuser-type" value="1"> Administrador
                         </label>
                     </div>
                     <input id="submit-type" type="submit" class="btn btn-success btn-block" name="newuser" value="Registrar">
@@ -214,7 +270,12 @@
             <article id="all-messages" class="well">
                 <h2>Todos los mensajes</h2>
                 <div class="container-fluid">
-                    
+                    <table class="table table-hover">
+                        <thead><th>Emisor</th><th>Receptor</th><th>Asunto</th><th>Fecha / Hora</th></thead>
+                        <tbody>
+                            <?php $MailServer->showAllMsg($totalcount); ?>
+                        </tbody>
+                    </table>
                 </div>
             </article>
             <!-- end FETCH ALL MESSAGES -->
@@ -237,6 +298,12 @@
             <!-- TOP MSGS RANKING -->
             <article id="ranking-msgs" class="well">
                 <h2>Ranking mensajes enviados</h2>
+                <table class="table table-hover">
+                    <thead><th>Nombre</th><th>Apellido</th><th>Nombre de usuario</th><th>Mensajes enviados</th></thead>
+                    <tbody>
+                        <?php $user->fetchMsgRanking(); ?>
+                    </tbody>
+                </table>
             </article>
             <!-- end TOP MSGS RANKING -->
             

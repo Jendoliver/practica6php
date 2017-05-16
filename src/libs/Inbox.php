@@ -11,12 +11,17 @@ class Inbox
         $this->paginationrate = $newPaginationrate;
     }
     
-    public function showMsgsTo($username)
+    public function setMsgs($num) { $this->msgs = $num; return $this; }
+    
+    public function showMsgsTo($username, $incount)
     {
         $con = connect(Constants::db);
-        $query = "SELECT * FROM message WHERE receiver = '$username' ORDER BY date DESC;";
+        $query = "SELECT `sender`, `subject`, `date`, `read`, `body` 
+                    FROM message WHERE receiver = '$username' 
+                    ORDER BY `date` DESC LIMIT $incount, ".$this->msgs.";";
         $res = $con->query($query);
         disconnect($con);
-        createTable($res);
+        Utils::createInboxTable($res);
+        Utils::paginate($incount, "incount", $this->paginationrate, $this->msgs);
     }
 }

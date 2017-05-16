@@ -1,6 +1,6 @@
 <?php
 
-class Inbox
+class Sent
 {
     // Attributes
     private $msgs;
@@ -11,12 +11,17 @@ class Inbox
         $this->paginationrate = $newPaginationrate;
     }
     
-    public function showMsgsFrom($username)
+    public function setMsgs($num) { $this->msgs = $num; return $this; }
+    
+    public function showMsgsFrom($username, $outcount)
     {
         $con = connect(Constants::db);
-        $query = "SELECT * FROM message WHERE sender = '$username' ORDER BY date DESC;";
+        $query = "SELECT `receiver`, `subject`, `date`, `body` 
+                    FROM message WHERE sender = '$username' 
+                    ORDER BY `date` DESC LIMIT $outcount, ".$this->msgs.";";
         $res = $con->query($query);
         disconnect($con);
-        createTable($res);
+        Utils::createSentTable($res);
+        Utils::paginate($outcount, "outcount", $this->paginationrate, $this->msgs);
     }
 }
