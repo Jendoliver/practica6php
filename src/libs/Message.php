@@ -28,7 +28,7 @@ class Message
     public function send()
     {
         $con = connect(Constants::db);
-        $query = "INSERT INTO message(`sender`, `receiver`, `read`, `subject`, `body`) VALUES ('".self::getFrom()."', '".self::getTo()."', 0, '".self::getSubj()."', '".self::getMsg()."');";
+        $query = "INSERT INTO message(`sender`, `receiver`, `date` `read`, `subject`, `body`) VALUES ('".self::getFrom()."', '".self::getTo()."', now(), 0, '".self::getSubj()."', '".self::getMsg()."');";
         if($con->query($query))
         {
             disconnect($con);

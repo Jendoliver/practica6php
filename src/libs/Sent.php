@@ -18,7 +18,7 @@ class Sent
         $con = connect(Constants::db);
         $query = "SELECT `receiver`, `subject`, `date`, `body` 
                     FROM message WHERE sender = '$username' 
-                    ORDER BY `date` DESC LIMIT $outcount, ".$this->msgs.";";
+                    ORDER BY `date` DESC LIMIT $outcount, ".$this->paginationrate.";";
         $res = $con->query($query);
         disconnect($con);
         Utils::createSentTable($res);

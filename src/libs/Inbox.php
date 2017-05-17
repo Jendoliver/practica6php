@@ -18,7 +18,7 @@ class Inbox
         $con = connect(Constants::db);
         $query = "SELECT `sender`, `subject`, `date`, `read`, `body` 
                     FROM message WHERE receiver = '$username' 
-                    ORDER BY `date` DESC LIMIT $incount, ".$this->msgs.";";
+                    ORDER BY `date` DESC LIMIT $incount, ".$this->paginationrate.";";
         $res = $con->query($query);
         disconnect($con);
         Utils::createInboxTable($res);

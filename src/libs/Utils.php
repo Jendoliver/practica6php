@@ -5,9 +5,6 @@ abstract class Utils
 {
     public static function paginate($pagecount, $countername, $pagerate, $total)
     {
-        /* a revisar
-        $params = array_merge($_GET, array($countername => $pagecount));
-        $GETargs = http_build_query($params); */
         if ($pagecount > 0) {
             echo "<a href='home.php?$countername=".($pagecount - $pagerate)."'>Anterior </a>";
         }

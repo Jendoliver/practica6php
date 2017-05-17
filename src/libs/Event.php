@@ -23,7 +23,7 @@ class Event
     public function submit() // Function called to insert an event into the db, returns true if inserted, false on fail
     {
         $con = connect(Constants::db);
-        $query = "INSERT INTO event(`user`, `type`) VALUES ('".self::getUser()."', '".self::getType()."');";
+        $query = "INSERT INTO event(`user`, `date`, `type`) VALUES ('".self::getUser()."', now(),'".self::getType()."');";
         if($con->query($query))
         {
             disconnect($con);

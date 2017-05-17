@@ -43,7 +43,9 @@ class MailServer
     public function showAllMsg($totalcount)
     {
         $con = connect(Constants::db);
-        $query = "SELECT `idmessage`, `sender`, `receiver`, `subject`, `date`, `read`, `body` FROM message ORDER BY date DESC LIMIT $totalcount, ".$this->totalmsgs;
+        $query = "SELECT `idmessage`, `sender`, `receiver`, `subject`, `date`, `read`, `body` 
+                    FROM message ORDER BY date DESC 
+                    LIMIT $totalcount, ".$this->paginationrate;
         $res = $con->query($query);
         disconnect($con);
         Utils::createAllMsgsTable($res);
