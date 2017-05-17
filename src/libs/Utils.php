@@ -40,9 +40,12 @@ abstract class Utils
                 echo "<tr>";
                 foreach($row as $key => $value)
                 {
-                    if($key != "read" && $key != "body")
+                    if($key == "idmessage")
+                        $id = $value;
+                    else if($key != "read" && $key != "body")
                         echo "<td>$value</td>";
                 }
+                echo "<td><button type='button' class='btn btn-primary btn-block' data-toggle='modal' data-target='#readMsg'><span class='glyphicon glyphicon-envelope'/></td>";
                 echo "</tr>";
             }
             else
@@ -50,9 +53,12 @@ abstract class Utils
                 echo "<tr style='background-color: #FFEEAA'>";
                 foreach($row as $key => $value)
                 {
-                    if($key != "read" && $key != "body")
+                    if($key == "idmessage")
+                        $id = $value;
+                    else if($key != "read" && $key != "body")
                         echo "<td style='font-weight: bold'>$value</td>";
                 }
+                echo "<td style='font-weight: bold'><button type='button' class='btn btn-primary btn-block' data-toggle='modal' data-target='#readMsg'><span class='glyphicon glyphicon-envelope'/></td>";
                 echo "</tr>";
             }
         }
@@ -65,9 +71,12 @@ abstract class Utils
             echo "<tr>";
             foreach($row as $key => $value)
             {
-                if($key != "body")
+                if($key == "idmessage")
+                    $id = $value;
+                else if($key != "body")
                     echo "<td>$value</td>";
             }
+            echo "<td style='font-weight: bold'><button type='button' class='btn btn-primary btn-block' data-toggle='modal' data-target='#readMsg'><span class='glyphicon glyphicon-envelope'/></td>";
             echo "</tr>";
         }
     }

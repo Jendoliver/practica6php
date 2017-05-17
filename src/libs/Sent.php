@@ -16,7 +16,7 @@ class Sent
     public function showMsgsFrom($username, $outcount)
     {
         $con = connect(Constants::db);
-        $query = "SELECT `receiver`, `subject`, `date`, `body` 
+        $query = "SELECT `idmessage`, `receiver`, `subject`, `date`, `body` 
                     FROM message WHERE sender = '$username' 
                     ORDER BY `date` DESC LIMIT $outcount, ".$this->paginationrate.";";
         $res = $con->query($query);

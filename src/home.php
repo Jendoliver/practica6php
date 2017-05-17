@@ -170,11 +170,12 @@
             <!-- end NEW MESSAGE -->
             
             <!-- INBOX -->
+            <?php require_once "modal-readmsg.php"; ?>
             <article id="inbox" class="well">
                 <h2>Mensajes recibidos</h2>
                 <div class="container-fluid">
                     <table class="table table-hover">
-                        <thead><th>Emisor</th><th>Asunto</th><th>Fecha / Hora</th></thead>
+                        <thead><th>Emisor</th><th>Asunto</th><th>Fecha / Hora</th><th>Leer</th></thead>
                         <tbody>
                             <?php $MailServer->getInbox()->showMsgsTo($user->getUsername(), $incount); ?>
                         </tbody>
@@ -188,7 +189,7 @@
                 <h2>Mensajes enviados</h2>
                 <div class="container-fluid">
                     <table class="table table-hover">
-                        <thead><th>Receptor</th><th>Asunto</th><th>Fecha / Hora</th></thead>
+                        <thead><th>Receptor</th><th>Asunto</th><th>Fecha / Hora</th><th>Leer</th></thead>
                         <tbody>
                             <?php $MailServer->getSent()->showMsgsFrom($user->getUsername(), $outcount); ?>
                         </tbody>

@@ -45,7 +45,7 @@ class User
         if ($res->num_rows > 0)
         {
             $row = $res->fetch_assoc();
-            if ($row["password"] == password_verify(self::getPassword(), $row["password"]))
+            if (password_verify(self::getPassword(), $row["password"]))
                 return UserEvents::OK;
             return UserEvents::WRONG_PASSWORD;
         }

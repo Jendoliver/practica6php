@@ -16,7 +16,7 @@ class Inbox
     public function showMsgsTo($username, $incount)
     {
         $con = connect(Constants::db);
-        $query = "SELECT `sender`, `subject`, `date`, `read`, `body` 
+        $query = "SELECT `idmessage`, `sender`, `subject`, `date`, `read`, `body` 
                     FROM message WHERE receiver = '$username' 
                     ORDER BY `date` DESC LIMIT $incount, ".$this->paginationrate.";";
         $res = $con->query($query);
