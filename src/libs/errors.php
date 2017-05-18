@@ -26,5 +26,6 @@ function errorUser($type)
         case UserEvents::WRONG_PASSWORD: alertError("La contraseña es incorrecta", $_SERVER['HTTP_REFERER']); break;
         case UserEvents::PASSWORDS_DONT_MATCH: alertError("Las contraseñas no coinciden", $_SERVER['HTTP_REFERER']); break;
         case UserEvents::SAME_PASSWORD: alertError("La nueva contraseña debe ser distinta a la actual", $_SERVER['HTTP_REFERER']); break;
+        case UserEvents::NOT_LOGGED: alertError("No has iniciado sesión", Constants::index); break;
     }
 }

@@ -20,7 +20,7 @@ abstract class Utils
         }
     }
     
-    public static function createTable($res) // Generic
+    public static function createTable($res) // Generic for user list
     {
         while($row = $res->fetch_assoc())
         {
@@ -31,11 +31,11 @@ abstract class Utils
         }
     }
     
-    public static function createInboxTable($res) // Specific to show unread msgs
+    public static function createInboxTable($res)
     {
         while($row = $res->fetch_assoc())
         {
-            if($row["read"])
+            if($row["read"]) // If the msg is read
             {
                 echo "<tr>";
                 foreach($row as $key => $value)
@@ -45,12 +45,12 @@ abstract class Utils
                     else if($key != "read" && $key != "body")
                         echo "<td>$value</td>";
                 }
-                echo "<td><button type='button' class='btn btn-primary btn-block' data-toggle='modal' data-target='#readMsg'><span class='glyphicon glyphicon-envelope'/></td>";
+                echo "<td><button id='$id' type='button' class='message btn btn-default btn-block' data-toggle='modal' data-target='#readMsg'><span class='glyphicon glyphicon-envelope'/></td>";
                 echo "</tr>";
             }
             else
             {
-                echo "<tr style='background-color: #FFEEAA'>";
+                echo "<tr class='msgrow' style='background-color: #FFEEAA'>";
                 foreach($row as $key => $value)
                 {
                     if($key == "idmessage")
@@ -58,7 +58,7 @@ abstract class Utils
                     else if($key != "read" && $key != "body")
                         echo "<td style='font-weight: bold'>$value</td>";
                 }
-                echo "<td style='font-weight: bold'><button type='button' class='btn btn-primary btn-block' data-toggle='modal' data-target='#readMsg'><span class='glyphicon glyphicon-envelope'/></td>";
+                echo "<td><button id='$id' type='button' class='message btn btn-primary btn-block' data-toggle='modal' data-target='#readMsg'><span class='glyphicon glyphicon-envelope'/></td>";
                 echo "</tr>";
             }
         }
@@ -76,12 +76,12 @@ abstract class Utils
                 else if($key != "body")
                     echo "<td>$value</td>";
             }
-            echo "<td style='font-weight: bold'><button type='button' class='btn btn-primary btn-block' data-toggle='modal' data-target='#readMsg'><span class='glyphicon glyphicon-envelope'/></td>";
+            echo "<td><button id='$id' type='button' class='message noupdate btn btn-default btn-block' data-toggle='modal' data-target='#readMsg'><span class='glyphicon glyphicon-envelope'/></td>";
             echo "</tr>";
         }
     }
     
-    public static function createAllMsgsTable($res) // Specific to show unread msgs
+    public static function createAllMsgsTable($res)
     {
         while($row = $res->fetch_assoc())
         {
@@ -90,19 +90,25 @@ abstract class Utils
                 echo "<tr>";
                 foreach($row as $key => $value)
                 {
-                    if($key != "read" && $key != "body" && $key != "idmessage")
+                    if($key == "idmessage")
+                        $id = $value;
+                    else if($key != "read" && $key != "body")
                         echo "<td>$value</td>";
                 }
+                echo "<td><button id='$id' type='button' class='message noupdate btn btn-default btn-block' data-toggle='modal' data-target='#readMsg'><span class='glyphicon glyphicon-envelope'/></td>";
                 echo "</tr>";
             }
             else
             {
-                echo "<tr style='background-color: #FFEEAA'>";
+                echo "<tr class='msgrow' style='background-color: #FFEEAA'>";
                 foreach($row as $key => $value)
                 {
-                    if($key != "read" && $key != "body" && $key != "idmessage")
+                    if($key == "idmessage")
+                        $id = $value;
+                    else if($key != "read" && $key != "body")
                         echo "<td style='font-weight: bold'>$value</td>";
                 }
+                echo "<td><button id='$id' type='button' class='message noupdate btn btn-primary btn-block' data-toggle='modal' data-target='#readMsg'><span class='glyphicon glyphicon-envelope'/></td>";
                 echo "</tr>";
             }
         }

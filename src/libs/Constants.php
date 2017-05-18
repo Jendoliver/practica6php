@@ -8,5 +8,5 @@ abstract class Constants
     const dbpass = "";
     
     // Routes
-    const index = "/index.php";
+    const index = "/src/index.php";
 }
