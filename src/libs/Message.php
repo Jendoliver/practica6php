@@ -9,7 +9,7 @@ class Message
     private $subj;
     private $msg;
     
-    // Constructor (thank god we don't need overloading here.. by the moment)
+    // Constructor
     function __construct($from, $to, $subj, $msg)
     {
         $this->from = $from;
@@ -28,7 +28,8 @@ class Message
     public function send()
     {
         $con = connect(Constants::db);
-        $query = "INSERT INTO message(`sender`, `receiver`, `date`, `read`, `subject`, `body`) VALUES ('".self::getFrom()."', '".self::getTo()."', now(), 0, '".self::getSubj()."', '".self::getMsg()."');";
+        $query = "INSERT INTO message(`sender`, `receiver`, `date`, `read`, `subject`, `body`) 
+                    VALUES ('".self::getFrom()."', '".self::getTo()."', now(), 0, '".self::getSubj()."', '".self::getMsg()."');";
         if($con->query($query))
         {
             disconnect($con);

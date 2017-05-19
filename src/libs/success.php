@@ -1,7 +1,7 @@
 <?php
 /*
 *
-*   errors.php: Error library
+*   success.php: Success messages library
 *
 */
 require_once "Constants.php";
@@ -30,5 +30,5 @@ function successUser($type)
 
 function lastLogin($date)
 {
-    alertSuccess("Última conexión: $date", $_SERVER['HTTP_REFERER']); break;
+    alertSuccess("Última conexión: $date", $_SERVER['HTTP_REFERER']);
 }

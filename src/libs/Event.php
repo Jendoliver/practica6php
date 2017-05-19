@@ -8,7 +8,7 @@ class Event
     private $user;
     private $type; // Holds an UserEvent
     
-    // Constructor (thank god we don't need overloading here)
+    // Constructor
     function __construct($userCalling, $typeEvent)
     {
         $this->user = $userCalling;
@@ -44,6 +44,6 @@ class Event
             $row = $res->fetch_row();
             return strval($row[0]);
         }
-        return "undefined"; // TODO: potential refactor here,
+        return "undefined";
     }
 }

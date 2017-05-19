@@ -13,7 +13,7 @@ function getMsg()
             dataType: "json",
             url: "js/getMsg.php?id="+id
     })
-    .done(function( data, textStatus, jqXHR ) {
+    .done(function( data ) {
         $("#from").html(data.sender).fadeIn();
         $("#date").html(data.date).fadeIn();
         $("#subj").html(data.subject).fadeIn();
@@ -29,7 +29,7 @@ function updateMsgStatus(id)
         dataType: "json",
         url: "js/updateMsgStatus.php?id="+id
     })
-    .done(function( data, textStatus, jqXHR ) {
+    .done(function( data ) {
         if(data.success == true)
         {
             $("#"+id).parent().siblings().removeAttr("style");

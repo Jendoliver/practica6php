@@ -9,10 +9,9 @@ class Admin extends User
     }
     
     // Ninja constructor for admins
-    public static function create()             { $instance = new self(); return $instance; }
-    
-    //TODO: add methods for...
-    public function checkUsers()    // - check list of all users
+    public static function create() { $instance = new self(); return $instance; }
+
+    public function checkUsers() // check list of all users
     {
         $con = connect(Constants::db);
         $res = $con->query("SELECT name, surname, username FROM user;");
@@ -33,7 +32,7 @@ class Admin extends User
         return false;
     }
     
-    public function showAllMsg() // - get list of all messages (paginated 15-15 with sender, receiver, datetime, subject and readbit)
+    public function showAllMsg() // get list of all messages (paginated 15-15 with sender, receiver, datetime, subject and readbit)
     {
         $mail = new MailServer();
         $mail->showAllMsg();
@@ -44,7 +43,7 @@ class Admin extends User
         return Event::fetchLastEvent($username, UserEvents::LOGIN);
     }
     
-    public function fetchMsgRanking() // - get ranking of users, sorted by sent message quantity
+    public function fetchMsgRanking() // get ranking of users, sorted by sent message quantity
     {
         $con = connect(Constants::db);
         $query = "SELECT name, surname, username, COUNT(*) AS msgs

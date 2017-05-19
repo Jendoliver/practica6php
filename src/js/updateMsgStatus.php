@@ -5,7 +5,7 @@ $id = $_GET["id"];
 $response = array();
 
 $con = connect(Constants::db);
-$res = $con->query("SELECT * FROM message WHERE idmessage = $id;");
+$res = $con->query("SELECT receiver FROM message WHERE idmessage = $id;");
 $row = $res->fetch_assoc();
 $user = User::create()->setUsername($row["receiver"])->submitEvent(UserEvents::MSG_CHECK);
 if($con->query("UPDATE message SET `read` = 1 WHERE idmessage = $id;"))

@@ -30,7 +30,7 @@ class User
     // Setters (ninja constructor overload)
     public function setUsername($newUsername)       { $this->username = $newUsername; return $this; }
     public function setPassword($newPassword)       { $this->password = password_hash($newPassword, PASSWORD_DEFAULT); return $this; }
-    public function setPasswordLogin($newPassword)  { $this->password = $newPassword; return $this; } // Patch
+    public function setPasswordLogin($newPassword)  { $this->password = $newPassword; return $this; } // Gipsy patch
     public function setName($newName)               { $this->name = $newName; return $this; }
     public function setSurname($newSurname)         { $this->surname = $newSurname; return $this; }
     public function setType($newType)               { $this->type = $newType; return $this; }
@@ -52,7 +52,7 @@ class User
         return UserEvents::USER_DOESNT_EXIST;
     }
     
-    public function register() // Function called when an user tries to register
+    public function register() // Function called when an user is being registered
     {
         $con = connect(Constants::db);
         $query = "INSERT INTO user VALUES ('".self::getUsername()."', '".self::getPassword()."', '".self::getName()."', '".self::getSurname()."', ".self::getType().");";
@@ -81,7 +81,8 @@ class User
     public function updateInfo() // Function that updates the information on the db WHERE username = $this->username
     {
         $con = connect(Constants::db);
-        $query = "UPDATE user SET password = '".self::getPassword()."', name = '".self::getName()."', surname = '".self::getSurname()."', type = ".self::getType()." WHERE username = '".self::getUsername()."';";
+        $query = "UPDATE user SET password = '".self::getPassword()."', name = '".self::getName()."', surname = '".self::getSurname()."', type = ".self::getType().
+                    " WHERE username = '".self::getUsername()."';";
         $con->query($query);
         return;
     }
@@ -100,13 +101,13 @@ class User
         return;
     }
     
-    public function checkInbox()
+    public function checkInbox() // Prints the inbox table
     {
         $mail = new MailServer();
         $mail->showInboxFrom($this->username);
     }
     
-    public function checkSent()
+    public function checkSent() // Prints the sent table
     {
         $mail = new MailServer();
         $mail->showSentFrom($this->username);
